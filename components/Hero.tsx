@@ -1,18 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { stagger, useAnimate } from "framer-motion";
 
 // Edit these to change the hero content.
 const NAME = "GOURAV GUPTA";
 const BOTTOM_TEXT = "FOUNDER · EDUCATOR · MENTOR";
 const PROFILE_SRC = "/gourav.webp";
+// Set to a video URL (e.g. "/showreel.mp4") to play it when the play button is clicked.
+const VIDEO_SRC = "";
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const EASE_IN_OUT: [number, number, number, number] = [0.76, 0, 0.24, 1];
 
-export default function Hero() {
+export default function Hero({ start = true }: { start?: boolean }) {
   const [scope, animate] = useAnimate<HTMLElement>();
+  const [playing, setPlaying] = useState(false);
 
   // Non-breaking spaces so the gap between words keeps its width as an inline-block.
   const letters = NAME.replace(/ /g, " ").split("");
@@ -20,6 +23,7 @@ export default function Hero() {
   const half = NAME.includes(" ") ? NAME.indexOf(" ") : Math.ceil(letters.length / 2);
 
   useEffect(() => {
+    if (!start) return;
     const hero = scope.current;
     const title = hero.querySelector<HTMLElement>("[data-title]")!;
 
@@ -64,7 +68,7 @@ export default function Hero() {
     };
 
     run();
-  }, [animate, scope]);
+  }, [animate, scope, start]);
 
   return (
     <section ref={scope} className="hero">
@@ -77,7 +81,7 @@ export default function Hero() {
         </a>
       </nav>
 
-      <div className="hero-heading">
+      <div className="hero-heading" data-shrink>
         <h1 className="hero-title" data-title aria-label={NAME}>
           {letters.map((char, i) => (
             <span key={i} className="hero-letter" aria-hidden {...(i < half ? { "data-left": "" } : { "data-right": "" })}>
@@ -91,6 +95,37 @@ export default function Hero() {
 
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img className="hero-portrait" src={PROFILE_SRC} alt="Portrait of Gourav Gupta" data-portrait />
+
+      <button type="button" className="hero-play" data-fade onClick={() => setPlaying(true)} aria-label="Play video">
+        <svg className="hero-play-ring" viewBox="0 0 100 100" aria-hidden>
+          <defs>
+            <path id="hero-play-circle" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" />
+          </defs>
+          <text>
+            <textPath href="#hero-play-circle">PLAY SHOWREEL • PLAY SHOWREEL • </textPath>
+          </text>
+        </svg>
+        <span className="hero-play-icon" aria-hidden>
+          <svg viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </span>
+      </button>
+
+      {playing && (
+        <div className="video-modal" role="dialog" aria-modal="true" onClick={() => setPlaying(false)}>
+          <button type="button" className="video-close" aria-label="Close video" onClick={() => setPlaying(false)}>
+            ✕
+          </button>
+          <div className="video-frame" onClick={(e) => e.stopPropagation()}>
+            {VIDEO_SRC ? (
+              <video src={VIDEO_SRC} controls autoPlay playsInline />
+            ) : (
+              <p className="video-empty">Video coming soon.</p>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="hero-bottom">
         <span className="hero-dot" data-fade />
