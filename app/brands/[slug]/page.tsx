@@ -16,20 +16,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const PORTRAIT_SRC = "/gourav.webp";
 
-// Placeholder "episodes" shown on every brand page until real content is added.
-const EPISODES = [
-  { title: "The Beginning", text: "How the idea started and the problem it set out to solve.", length: "12m" },
-  { title: "Building the Team", text: "The people, the culture and the first big wins.", length: "18m" },
-  { title: "Scaling Up", text: "Growing from a small start to an established name.", length: "21m" },
-  { title: "What's Next", text: "The road ahead and the next chapter of the story.", length: "15m" },
-];
-
 export default async function BrandPage({ params }: Props) {
   const brand = getBrand((await params).slug);
   if (!brand) notFound();
 
   const [from, to] = brand.colors;
   const others = BRANDS.filter((b) => b.slug !== brand.slug);
+  const episodes = brand.sections;
 
   return (
     <main className="title-page" style={{ "--brand": from, "--brand-2": to } as React.CSSProperties}>
@@ -49,11 +42,11 @@ export default async function BrandPage({ params }: Props) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="billboard-portrait" src={PORTRAIT_SRC} alt="" />
           <span className="billboard-chip billboard-chip-top">
-            <strong>Since {brand.since}</strong>
+            <strong>{brand.since ? `Since ${brand.since}` : brand.name}</strong>
             {brand.category}
           </span>
           <span className="billboard-chip billboard-chip-bottom">
-            <strong>{EPISODES.length} Episodes</strong>
+            <strong>{episodes.length} Episodes</strong>
             Now streaming
           </span>
         </div>
@@ -67,9 +60,9 @@ export default async function BrandPage({ params }: Props) {
 
           <p className="billboard-meta">
             <span className="billboard-rating">U/A</span>
-            <span>{brand.since} – Present</span>
+            {brand.since && <span>{brand.since} – Present</span>}
             <span>{brand.category}</span>
-            <span>{EPISODES.length} Episodes</span>
+            <span>{episodes.length} Episodes</span>
             {brand.badge && <span className="billboard-badge">{brand.badge}</span>}
           </p>
           <p className="billboard-role">{brand.role}</p>
@@ -120,7 +113,7 @@ export default async function BrandPage({ params }: Props) {
       <section className="title-row" id="episodes">
         <h2>Episodes</h2>
         <ol className="episodes">
-          {EPISODES.map((ep, i) => (
+          {episodes.map((ep, i) => (
             <li key={ep.title} className="episode">
               <span className="episode-num">{i + 1}</span>
               <span className="episode-thumb">
@@ -128,11 +121,19 @@ export default async function BrandPage({ params }: Props) {
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </span>
-              <span className="episode-body">
+              <div className="episode-body">
                 <strong>{ep.title}</strong>
-                <span>{ep.text}</span>
-              </span>
-              <span className="episode-len">{ep.length}</span>
+                {ep.text?.map((t) => <p key={t}>{t}</p>)}
+                {ep.items && (
+                  <ul>
+                    {ep.items.map((it) => (
+                      <li key={it.label}>
+                        <b>{it.label}:</b> {it.text}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </li>
           ))}
         </ol>

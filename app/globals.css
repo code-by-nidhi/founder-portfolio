@@ -901,8 +901,8 @@ a {
 
 .episode {
   display: grid;
-  grid-template-columns: 40px clamp(110px, 16vw, 160px) 1fr auto;
-  align-items: center;
+  grid-template-columns: 40px clamp(110px, 16vw, 160px) 1fr;
+  align-items: start;
   gap: clamp(12px, 2vw, 24px);
   padding: 20px 12px;
   border-bottom: 1px solid rgba(241, 239, 233, 0.1);
@@ -953,9 +953,16 @@ a {
   color: var(--fg);
 }
 
-.episode-len {
-  font-size: 0.85rem;
-  color: var(--muted);
+.episode-body ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 1.1em;
+}
+
+.episode-body li b {
+  font-weight: 600;
+  color: var(--fg);
 }
 
 @keyframes title-up {
@@ -1013,10 +1020,10 @@ a {
   }
 
   .episode {
-    grid-template-columns: 28px 100px 1fr;
+    grid-template-columns: 28px 1fr;
   }
 
-  .episode-len {
+  .episode-thumb {
     display: none;
   }
 }
